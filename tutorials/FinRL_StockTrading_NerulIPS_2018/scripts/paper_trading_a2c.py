@@ -1,5 +1,5 @@
 import json
-from stable_baselines3 import A2C
+from stable_baselines3 import DDPG
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
 from finrl.config import INDICATORS
 
@@ -17,18 +17,18 @@ ticker_list = config["training"]["ticker_list"]
 time_interval = config["training"]["time_interval"]
 action_dim = len(ticker_list)
 state_dim = eval(config["training"]["state_dim_formula"].replace("action_dim", str(action_dim)).replace("INDICATORS", "INDICATORS"))
-model_path = "tutorials/FinRL_StockTrading_NerulIPS_2018/models/a2c_model.zip"  # Path to your A2C model
+model_path = "tutorials/FinRL_StockTrading_NerulIPS_2018/models/agent_ddpg.zip"  # Path to your DDPG model
 
-# Load the A2C model
-model = A2C.load(model_path)
-print("A2C model loaded successfully!")
+# Load the DDPG model
+model = DDPG.load(model_path)
+print("DDPG model loaded successfully!")
 
-# Set up PaperTradingAlpaca for A2C
-paper_trading_a2c = PaperTradingAlpaca(
+# Set up PaperTradingAlpaca for DDPG
+paper_trading_ddpg = PaperTradingAlpaca(
     ticker_list=ticker_list,
     time_interval=time_interval,
     drl_lib="stable_baselines3",
-    agent="a2c",  # Specify that it's A2C
+    agent="ddpg",  # Specify that it's DDPG
     cwd=model_path,
     net_dim=config["training"]["net_dimension"],
     state_dim=state_dim,
@@ -41,5 +41,5 @@ paper_trading_a2c = PaperTradingAlpaca(
     max_stock=config["trading"]["max_stock"]
 )
 
-# Run the paper trading simulation with A2C
-paper_trading_a2c.run()
+# Run the paper trading simulation with DDPG
+paper_trading_ddpg.run()
