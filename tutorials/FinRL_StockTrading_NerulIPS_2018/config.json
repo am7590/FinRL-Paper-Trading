@@ -1,0 +1,32 @@
+{
+  "alpaca": {
+    "data_api_key": "PKNI2T9HDHMYPSQPNJ3Q",
+    "data_api_secret": "4s8T2cbAuCTITsnqcdoxnVbWKbHyNjKOWNJfWmct",
+    "data_api_base_url": "https://paper-api.alpaca.markets",
+    "trading_api_key": "PKNI2T9HDHMYPSQPNJ3Q",
+    "trading_api_secret": "4s8T2cbAuCTITsnqcdoxnVbWKbHyNjKOWNJfWmct",
+    "trading_api_base_url": "https://paper-api.alpaca.markets"
+  },
+  "training": {
+    "time_interval": "1Min",
+    "ticker_list": ["AAPL", "MSFT", "GOOG"],
+    "net_dimension": [128, 64],
+    "target_step": 5000,
+    "break_step": 100000,
+    "eval_gap": 30,
+    "eval_times": 1,
+    "state_dim_formula": "1 + 2 + 3 * action_dim + len(INDICATORS) * action_dim"
+  },
+  "trading": {
+    "turbulence_thresh": 30,
+    "max_stock": 100
+  },
+  "dates": {
+    "train_start_date": "2023-01-01",
+    "train_end_date": "2023-09-01",
+    "test_start_date": "2023-09-02",
+    "test_end_date": "2023-10-01",
+    "full_train_start_date": "2023-01-01",
+    "full_train_end_date": "2023-10-01"
+  }
+}
