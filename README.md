@@ -1,20 +1,6 @@
 # FinRL-Paper-Trading
 
-This repository provides a Dockerized solution for running multiple deep reinforcement learning (DRL) algorithms for paper trading in stock markets using the [FinRL](https://github.com/AI4Finance-Foundation/FinRL) library. It includes multiple tutorials from FinRL, each implementing different DRL algorithms such as A2C, PPO, TD3, and DDPG, which can be run concurrently to simulate various trading strategies. This setup is ideal for backtesting and analyzing the performance of different strategies using historical stock market data in a containerized environment.
-
-## Project Structure
-
-- **Dockerfile**: The Docker configuration file to create a reproducible environment for running all paper trading scripts.
-- **docker-compose.yml**: Optional, for future support of concurrent running using `docker-compose`.
-- **requirements.txt**: Lists all necessary Python dependencies for running the project.
-- **tutorials**: Contains multiple subdirectories, each with paper trading scripts for different tutorials.
-  - `FinRL_PaperTrading_Demo`: A demonstration of paper trading with the FinRL framework.
-  - `FinRL_PortfolioAllocation_Explainable_DRL`: Includes explainable DRL models like A2C and PPO.
-  - `FinRL_PortfolioAllocation_NeurIPS_2020`: Portfolio allocation with TD3 and DDPG models.
-  - `FinRL_StockTrading_Fundamental`: Stock trading based on fundamental data, using A2C and PPO.
-  - `FinRL_StockTrading_NerulIPS_2018`: Implements stock trading strategies based on NeurIPS 2018 paper, using A2C and PPO.
-
-## Getting Started
+This repository provides a Dockerized solution for running multiple deep reinforcement learning (DRL) algorithms for paper trading in stock markets using the [FinRL](https://github.com/AI4Finance-Foundation/FinRL) library. It includes multiple tutorials from FinRL, each implementing different DRL algorithms such as A2C, PPO, TD3, and DDPG, which can be run concurrently to simulate various trading strategies. 
 
 These instructions will help you set up and run the project in a Docker container to ensure compatibility and avoid local dependency issues.
 
@@ -79,5 +65,5 @@ Each tutorial directory contains a config.json file with model-specific configur
 ## Future Improvements
 This setup can be adapted for API-based use cases, where an external service (e.g., FinRobot) can trigger each script through an HTTP request or similar. Further modularization into a class structure for each trading strategy could improve integration with external services.
 
-License
+## License
 This project is licensed under the MIT License.
