@@ -12,47 +12,49 @@ These instructions will help you set up and run the project in a Docker containe
 ### Installation
 
 1. **Clone the Repository**
+- `git clone https://github.com/am7590/FinRL-Paper-Trading.git`
+- `cd FinRL-Paper-Trading`
 
-   `bash
-   git clone https://github.com/am7590/FinRL-Paper-Trading.git
-   cd FinRL-Paper-Trading`
+2. **Initialize our forked FinRL Submodule**
+- `git submodule init`
+- `git submodule update --recursive`
+   
+3. **Build the Docker Image**
 
-2. **Build the Docker Image**
+   Run the following command in the root directory of the project to build the Docker image:
 
-Run the following command in the root directory of the project to build the Docker image:
+   `docker build -t finrl-paper-trading .`
 
-`docker build -t finrl-paper-trading .`
-
-This will create a Docker image named finrl-paper-trading, encapsulating all dependencies and configuration needed to run the project.
+   This will create a Docker image named finrl-paper-trading, encapsulating all dependencies and configuration needed to run the project.
 
 ## Usage
 
-Run the container interactively to execute each paper trading script as needed:
+   Run the container interactively to execute each paper trading script as needed:
 
-`docker run -it --rm --name finrl-container finrl-paper-trading /bin/bash`
+   `docker run -it --rm --name finrl-container finrl-paper-trading /bin/bash`
 
 ## Execute Paper Trading Scripts
 Navigate to each directory and execute scripts as needed:
 
 - FinRL_PortfolioAllocation_Explainable_DRL (A2C and PPO)
-`cd ../../FinRL_PortfolioAllocation_Explainable_DRL/scripts
-python a2c_paper_trading.py
-python ppo_paper_trading.py`
+   - `cd ../../FinRL_PortfolioAllocation_Explainable_DRL/scripts`
+   - `python a2c_paper_trading.py`
+   - `python ppo_paper_trading.py`
 
 - FinRL_PortfolioAllocation_NeurIPS_2020 (TD3 and DDPG)
-`cd ../../FinRL_PortfolioAllocation_NeurIPS_2020/scripts
-python td3_paper_trading.py
-python ddpg_paper_trading.py`
+   - `cd ../../FinRL_PortfolioAllocation_NeurIPS_2020/scripts`
+   - `python td3_paper_trading.py`
+   - `python ddpg_paper_trading.py`
 
 - FinRL_StockTrading_Fundamental (A2C and PPO)
-`cd ../../FinRL_StockTrading_Fundamental/scripts
-python a2c_paper_trading.py
-python ppo_paper_trading.py`
+   - `cd ../../FinRL_StockTrading_Fundamental/scripts`
+   - `python a2c_paper_trading.py`
+   - `python ppo_paper_trading.py`
 
 - FinRL_StockTrading_NerulIPS_2018 (A2C and PPO)
-`cd ../../FinRL_StockTrading_NerulIPS_2018/scripts
-python a2c_paper_trading.py
-python ppo_paper_trading.py`
+   - `cd ../../FinRL_StockTrading_NerulIPS_2018/scripts`
+   - `python a2c_paper_trading.py`
+   - `python ppo_paper_trading.py`
 
 Type exit to close the Docker container when you're finished.
 
