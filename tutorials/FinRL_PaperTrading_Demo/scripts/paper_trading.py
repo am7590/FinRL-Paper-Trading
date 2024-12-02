@@ -4,13 +4,14 @@ from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
 from finrl.meta.paper_trading.common import train, test, alpaca_history, DIA_history
 from finrl.config import INDICATORS
 from finrl.config_tickers import DOW_30_TICKER
-import datetime
 from pandas.tseries.offsets import BDay
-import matplotlib.pyplot as plt
-from matplotlib import ticker
-import gym
+import os
 
-with open('tutorials/FinRL_PaperTrading_Demo/config.json', 'r') as f:
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PaperTrading_Demo/config.json')
+MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PaperTrading_Demo/papertrading_erl_retrain')
+
+with open(CONFIG_PATH, 'r') as f:
     config = json.load(f)
 
 DATA_API_KEY = config["alpaca"]["data_api_key"]
@@ -44,7 +45,7 @@ paper_trading_erl = PaperTradingAlpaca(
     time_interval=config["training"]["time_interval"],
     drl_lib="elegantrl",
     agent="ppo",
-    cwd="tutorials/FinRL_PaperTrading_Demo/papertrading_erl_retrain",
+    cwd=CONFIG_PATH,
     net_dim=ERL_PARAMS["net_dimension"],
     state_dim=state_dim,
     action_dim=action_dim,

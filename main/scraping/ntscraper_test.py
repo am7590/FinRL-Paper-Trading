@@ -6,7 +6,6 @@ It seems like it's keyword seaching is broken, but we are still able to obtain p
 TODO: Find a working scraping library for hashtags or keywords
 '''
 
-# Initialize the scraper
 scraper = Nitter()
 
 # Scrape tweets from a specific user

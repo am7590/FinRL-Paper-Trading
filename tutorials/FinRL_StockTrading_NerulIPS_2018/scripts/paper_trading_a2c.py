@@ -2,9 +2,14 @@ import json
 from stable_baselines3 import DDPG
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
 from finrl.config import INDICATORS
+import os
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_NerulIPS_2018/config.json')
+MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_NerulIPS_2018/models/agent_ddpg.zip')
 
 # Load configuration
-with open('tutorials/FinRL_StockTrading_NerulIPS_2018/config.json', 'r') as f:
+with open(CONFIG_PATH, 'r') as f:
     config = json.load(f)
 
 # API Keys
@@ -17,10 +22,9 @@ ticker_list = config["training"]["ticker_list"]
 time_interval = config["training"]["time_interval"]
 action_dim = len(ticker_list)
 state_dim = eval(config["training"]["state_dim_formula"].replace("action_dim", str(action_dim)).replace("INDICATORS", "INDICATORS"))
-model_path = "tutorials/FinRL_StockTrading_NerulIPS_2018/models/agent_ddpg.zip"  # Path to your DDPG model
 
 # Load the DDPG model
-model = DDPG.load(model_path)
+model = DDPG.load(MODEL_PATH)
 print("DDPG model loaded successfully!")
 
 # Set up PaperTradingAlpaca for DDPG
@@ -29,7 +33,7 @@ paper_trading_ddpg = PaperTradingAlpaca(
     time_interval=time_interval,
     drl_lib="stable_baselines3",
     agent="ddpg",  # Specify that it's DDPG
-    cwd=model_path,
+    cwd=MODEL_PATH,
     net_dim=config["training"]["net_dimension"],
     state_dim=state_dim,
     action_dim=action_dim,

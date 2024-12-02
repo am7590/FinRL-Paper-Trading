@@ -2,9 +2,14 @@ import json
 from stable_baselines3 import A2C
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
 from finrl.config import INDICATORS
+import os
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_NerulIPS_2018/config.json')
+MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_NerulIPS_2018/models/a2c_model.zip')
 
 # Load configuration
-with open('tutorials/FinRL_StockTrading_NerulIPS_2018/config.json', 'r') as f:
+with open(CONFIG_PATH, 'r') as f:
     config = json.load(f)
 
 # API Keys
@@ -17,10 +22,9 @@ ticker_list = config["training"]["ticker_list"]
 time_interval = config["training"]["time_interval"]
 action_dim = len(ticker_list)
 state_dim = eval(config["training"]["state_dim_formula"].replace("action_dim", str(action_dim)).replace("INDICATORS", "INDICATORS"))
-model_path = "tutorials/FinRL_StockTrading_NerulIPS_2018/models/a2c_model.zip"  # Path to your A2C model
 
 # Load the A2C model
-model = A2C.load(model_path)
+model = A2C.load(MODEL_PATH)
 print("A2C model loaded successfully!")
 
 # Set up PaperTradingAlpaca for A2C
@@ -28,8 +32,8 @@ paper_trading_a2c = PaperTradingAlpaca(
     ticker_list=ticker_list,
     time_interval=time_interval,
     drl_lib="stable_baselines3",
-    agent="a2c",  # Specify that it's A2C
-    cwd=model_path,
+    agent="a2c", 
+    cwd=MODEL_PATH,
     net_dim=config["training"]["net_dimension"],
     state_dim=state_dim,
     action_dim=action_dim,
@@ -41,5 +45,4 @@ paper_trading_a2c = PaperTradingAlpaca(
     max_stock=config["trading"]["max_stock"]
 )
 
-# Run the paper trading simulation with A2C
 paper_trading_a2c.run()

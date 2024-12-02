@@ -2,9 +2,14 @@ import json
 from stable_baselines3 import PPO
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
 from finrl.config import INDICATORS
+import os
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_Fundamental/config.json')
+MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_Fundamental/models/trained_ppo.zip')
 
 # Load configuration
-with open('tutorials/FinRL_StockTrading_Fundamental/config.json', 'r') as f:
+with open(CONFIG_PATH, 'r') as f:
     config = json.load(f)
 
 # API Keys
@@ -19,8 +24,7 @@ action_dim = len(ticker_list)
 state_dim = eval(config["training"]["state_dim_formula"].replace("action_dim", str(action_dim)).replace("INDICATORS", "INDICATORS"))
 
 # PPO Paper Trading
-ppo_model_path = "tutorials/FinRL_StockTrading_Fundamental/models/trained_ppo.zip"
-ppo_model = PPO.load(ppo_model_path)
+ppo_model = PPO.load(MODEL_PATH)
 print("PPO model loaded successfully!")
 
 paper_trading_ppo = PaperTradingAlpaca(
@@ -28,7 +32,7 @@ paper_trading_ppo = PaperTradingAlpaca(
     time_interval=time_interval,
     drl_lib="stable_baselines3",
     agent="ppo",
-    cwd=ppo_model_path,
+    cwd=MODEL_PATH,
     net_dim=config["training"]["net_dimension"],
     state_dim=state_dim,
     action_dim=action_dim,

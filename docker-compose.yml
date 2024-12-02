@@ -4,3 +4,8 @@ services:
   finrl:
     build:
       context: .
+    container_name: finrl-paper-trading
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
