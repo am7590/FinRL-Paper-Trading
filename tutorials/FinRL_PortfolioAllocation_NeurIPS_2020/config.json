@@ -1,10 +1,10 @@
 {
   "alpaca": {
-    "data_api_key": "PKNI2T9HDHMYPSQPNJ3Q",
-    "data_api_secret": "4s8T2cbAuCTITsnqcdoxnVbWKbHyNjKOWNJfWmct",
+    "data_api_key": "PK1IAOCDGLVD9FYIKWC4",
+    "data_api_secret": "HxrFc3JLpZcOn1OSTvuF1MkFhCM7ppshaovL49bw",
     "data_api_base_url": "https://paper-api.alpaca.markets",
-    "trading_api_key": "PKNI2T9HDHMYPSQPNJ3Q",
-    "trading_api_secret": "4s8T2cbAuCTITsnqcdoxnVbWKbHyNjKOWNJfWmct",
+    "trading_api_key": "PK1IAOCDGLVD9FYIKWC4",
+    "trading_api_secret": "HxrFc3JLpZcOn1OSTvuF1MkFhCM7ppshaovL49bw",
     "trading_api_base_url": "https://paper-api.alpaca.markets"
   },
   "training": {
