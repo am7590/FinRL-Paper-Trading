@@ -69,8 +69,8 @@ class FinRLEngine:
             hmax=100,  # maximum number of shares to trade
             initial_amount=self.config.get('initial_amount', 100000),
             num_stock_shares=[0] * stock_dimension,  # initially no shares
-            buy_cost_pct=self.config.get('buy_cost_pct', 0.001),  # transaction cost
-            sell_cost_pct=self.config.get('sell_cost_pct', 0.001),
+            buy_cost_pct=[self.config.get('buy_cost_pct', 0.001)] * stock_dimension,  # Make this a list
+            sell_cost_pct=[self.config.get('sell_cost_pct', 0.001)] * stock_dimension,  # Make this a list
             state_space=state_space,  # number of features + price + shares
             action_space=stock_dimension,  # action for each stock
             tech_indicator_list=self.config.get('technical_indicators', [
@@ -176,22 +176,76 @@ class FinRLEngine:
         if self.mode == TradingMode.SIMULATION:
             if isinstance(action, dict):
                 action = self._convert_action_to_array(action)
-            state, reward, done, info = self.env.step(action)
-            return {
-                'state': state,
-                'reward': reward,
-                'done': done,
-                'info': info
-            }
+            
+            try:
+                # Ensure action has correct shape
+                if len(action.shape) == 1:
+                    action = action.reshape(-1)
+                    
+                # Execute step in environment
+                step_result = self.env.step(action)
+                
+                # Debug print
+                print(f"Step result type: {type(step_result)}")
+                print(f"Step result: {step_result}")
+                
+                # Handle different return types
+                if isinstance(step_result, tuple):
+                    if len(step_result) == 5:  # Some environments return 5 values
+                        state, reward, terminated, truncated, info = step_result
+                        done = terminated or truncated
+                    elif len(step_result) == 4:
+                        state, reward, done, info = step_result
+                    else:
+                        raise ValueError(f"Unexpected number of return values: {len(step_result)}")
+                else:
+                    state = step_result.get('state')
+                    reward = step_result.get('reward')
+                    done = step_result.get('done')
+                    info = step_result.get('info', {})
+                    
+                return {
+                    'state': state,
+                    'reward': reward,
+                    'done': done,
+                    'info': info
+                }
+                
+            except Exception as e:
+                print(f"Error executing trade: {str(e)}")
+                raise
         else:
             return await self.paper_trading.execute_trade(action)
     
     async def get_state(self) -> Dict[str, Any]:
         """Get current state of the trading environment"""
         if self.mode == TradingMode.SIMULATION:
+            if not hasattr(self.env, 'state') or self.env.state is None:
+                return {
+                    'portfolio_value': 0.0,
+                    'positions': None,
+                    'market_data': self._get_current_market_data()
+                }
+            
+            # Parse state array:
+            # state[0] = portfolio value
+            # state[1:stock_dim+1] = stock prices
+            # state[stock_dim+1:2*stock_dim+1] = shares held
+            # state[2*stock_dim+1:] = technical indicators
+            state = self.env.state
+            stock_dim = len(self.config.get('ticker_list', ['AAPL']))
+            
+            positions = {}
+            for i in range(stock_dim):
+                ticker = self.config['ticker_list'][i]
+                positions[ticker] = {
+                    'price': float(state[i + 1]),
+                    'shares': float(state[i + stock_dim + 1])
+                }
+            
             return {
-                'portfolio_value': float(self.env.portfolio_value),
-                'positions': self.env.state_memory[-1] if len(self.env.state_memory) > 0 else None,
+                'portfolio_value': float(state[0]),
+                'positions': positions,
                 'market_data': self._get_current_market_data()
             }
         else:
@@ -199,8 +253,14 @@ class FinRLEngine:
     
     def _convert_action_to_array(self, action: Dict[str, Any]) -> np.ndarray:
         """Convert action dictionary to numpy array format"""
-        # Implement based on your action space
-        return np.array([action.get('amount', 0)])
+        # For single stock, action should be array of shape (1,)
+        # Amount between 0 and 1 represents percentage of portfolio to invest
+        amount = action.get('amount', 0)
+        # Convert to array of shape (stock_dimension,)
+        stock_dimension = len(self.config.get('ticker_list', ['AAPL']))
+        action_array = np.zeros(stock_dimension)
+        action_array[0] = amount  # Apply action to first stock
+        return action_array
     
     def _get_current_market_data(self) -> Dict[str, Any]:
         """Get current market data for simulation"""
@@ -208,9 +268,19 @@ class FinRLEngine:
             return {}
             
         current_step = getattr(self.env, 'current_step', 0)
+        
+        # Get the row at current_step
+        current_data = self.env.df.iloc[current_step]
+        
         return {
-            'prices': self.env.data.iloc[current_step].to_dict(),
-            'timestamp': self.env.data.index[current_step]
+            'prices': {
+                'open': float(current_data['open']),
+                'high': float(current_data['high']),
+                'low': float(current_data['low']),
+                'close': float(current_data['close']),
+                'volume': float(current_data['volume'])
+            },
+            'timestamp': pd.Timestamp(current_data['date']).isoformat()
         }
 
     def save_model(self, path: str):
