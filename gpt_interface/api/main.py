@@ -4,6 +4,8 @@ from ..core.agent_manager import FinancialAgentManager
 from ..simulation import SimulationEnvironment
 from typing import Dict, Any
 import logging
+import os
+from ..trading_core.finrl_wrapper.engine import FinRLEngine, TradingMode, ModelType
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -83,3 +85,24 @@ async def run_backtest(config: Dict[str, Any]):
         return results
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) 
+
+@app.post("/deploy")
+async def deploy_model(
+    ticker: str,
+    model_type: str = "ppo",
+    mode: str = "paper"
+):
+    config = {
+        'mode': mode,
+        'model_type': model_type,
+        'ticker_list': [ticker],
+        'technical_indicators': ['macd'],
+        'ALPACA_API_KEY': os.getenv('ALPACA_API_KEY'),
+        'ALPACA_SECRET_KEY': os.getenv('ALPACA_SECRET_KEY')
+    }
+    
+    engine = FinRLEngine(config)
+    await engine.setup_environment()
+    model = await engine.train_model()
+    
+    return {"status": "success", "message": "Model deployed to paper trading"}
