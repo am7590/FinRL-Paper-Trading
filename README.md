@@ -31,7 +31,7 @@ These instructions will help you set up and run the project in a Docker containe
 
    Run the container interactively to execute each paper trading script as needed:
 
-   `docker run -it --rm --name finrl-container finrl-paper-trading /bin/bash`
+   `docker run -it --rm --name finrl-container finrl-paper-trading bash`
 
 ## Execute Paper Trading Scripts
 Navigate to each directory and execute scripts as needed:

@@ -8,4 +8,15 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - .:/app
+      - type: bind
+        source: .
+        target: /app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

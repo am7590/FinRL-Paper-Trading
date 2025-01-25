@@ -1,8 +1,9 @@
+# Rest of the Dockerfile remains unchanged
 FROM python:3.10.15
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Update ENV syntax to use recommended format
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set working directory inside the container
 WORKDIR /app
@@ -26,7 +27,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Initialize and update submodules (for finrl)
-RUN git submodule init && git submodule update --recursive
+# RUN git submodule init && git submodule update --recursive
 
 # Copy the entire project directory into the container
 COPY . /app
