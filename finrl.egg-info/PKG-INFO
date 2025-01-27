@@ -1,0 +1,10 @@
+Metadata-Version: 2.2
+Name: finrl
+Version: 0.1.0
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: stable-baselines3
+Requires-Dist: alpaca-trade-api>=3.0.0
+Requires-Dist: gymnasium>=0.28.1
+Requires-Dist: torch>=1.13.1
+Dynamic: requires-dist
