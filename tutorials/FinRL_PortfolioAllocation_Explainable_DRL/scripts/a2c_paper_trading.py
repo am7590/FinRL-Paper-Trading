@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import sys
 import os
 
@@ -9,9 +9,6 @@ sys.path.append(ROOT_DIR)
 # Rest of your imports...
 from finrl.finrl.meta.env_stock_trading.env_stock_papertrading import AlpacaPaperTrading as PaperTradingAlpaca
 
-=======
-<<<<<<< Updated upstream
->>>>>>> e863c9d1ff54bdae2107f7e299a665beaedb58af
 import json
 from stable_baselines3 import A2C
 # from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
@@ -68,16 +65,15 @@ try:
         model=wrapped_model
     )
 
-<<<<<<< HEAD
     # Run A2C paper trading
     paper_trading_a2c.run()
 except Exception as e:
     print(f"Error during paper trading: {e}")
     raise
-=======
+
 # Run A2C paper trading
 paper_trading_a2c.run()
-=======
+
 import json
 from stable_baselines3 import A2C
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
@@ -126,5 +122,3 @@ paper_trading_a2c = PaperTradingAlpaca(
 
 # Run A2C paper trading
 paper_trading_a2c.run()
->>>>>>> Stashed changes
->>>>>>> e863c9d1ff54bdae2107f7e299a665beaedb58af
