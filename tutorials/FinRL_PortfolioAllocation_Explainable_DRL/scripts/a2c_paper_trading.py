@@ -3,6 +3,7 @@ from stable_baselines3 import A2C
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
 from finrl.config import INDICATORS
 import os
+from tutorials.utils.observation_wrapper import ObservationReshapeWrapper
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
 CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/config.json')
@@ -27,6 +28,9 @@ state_dim = eval(config["training"]["state_dim_formula"].replace("action_dim", s
 a2c_model = A2C.load(MODEL_PATH)
 print("A2C model loaded successfully!")
 
+# Wrap the model with our observation reshaper
+wrapped_model = ObservationReshapeWrapper(a2c_model)
+
 paper_trading_a2c = PaperTradingAlpaca(
     ticker_list=ticker_list,
     time_interval=time_interval,
@@ -41,7 +45,8 @@ paper_trading_a2c = PaperTradingAlpaca(
     API_BASE_URL=TRADING_API_BASE_URL,
     tech_indicator_list=INDICATORS,
     turbulence_thresh=config["trading"]["turbulence_thresh"],
-    max_stock=config["trading"]["max_stock"]
+    max_stock=config["trading"]["max_stock"],
+    model=wrapped_model
 )
 
 # Run A2C paper trading

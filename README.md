@@ -36,27 +36,54 @@ These instructions will help you set up and run the project in a Docker containe
 ## Execute Paper Trading Scripts
 Navigate to each directory and execute scripts as needed:
 
+### Important Note About Model Input Shape
+The models expect specific input shapes for observations. If you encounter shape mismatch errors, you may need to adjust your data preprocessing to match the expected shapes:
+- Default expected shape: (20, 16)
+- Current shape causing error: (58,)
+
+### Available Scripts
+
 - FinRL_PortfolioAllocation_Explainable_DRL (A2C and PPO)
-   - `cd ../../FinRL_PortfolioAllocation_Explainable_DRL/scripts`
-   - `python a2c_paper_trading.py`
-   - `python ppo_paper_trading.py`
+   ```bash
+   cd tutorials/FinRL_PortfolioAllocation_Explainable_DRL/scripts
+   python a2c_paper_trading.py
+   python ppo_paper_trading.py
+   ```
 
 - FinRL_PortfolioAllocation_NeurIPS_2020 (TD3 and DDPG)
-   - `cd ../../FinRL_PortfolioAllocation_NeurIPS_2020/scripts`
-   - `python td3_paper_trading.py`
-   - `python ddpg_paper_trading.py`
+   ```bash
+   cd tutorials/FinRL_PortfolioAllocation_NeurIPS_2020/scripts
+   python td3_paper_trading.py
+   python ddpg_paper_trading.py
+   ```
 
 - FinRL_StockTrading_Fundamental (A2C and PPO)
-   - `cd ../../FinRL_StockTrading_Fundamental/scripts`
-   - `python a2c_paper_trading.py`
-   - `python ppo_paper_trading.py`
+   ```bash
+   cd tutorials/FinRL_StockTrading_Fundamental/scripts
+   python a2c_paper_trading.py
+   python ppo_paper_trading.py
+   ```
 
 - FinRL_StockTrading_NerulIPS_2018 (A2C and PPO)
-   - `cd ../../FinRL_StockTrading_NerulIPS_2018/scripts`
-   - `python a2c_paper_trading.py`
-   - `python ppo_paper_trading.py`
+   ```bash
+   cd tutorials/FinRL_StockTrading_NerulIPS_2018/scripts
+   python a2c_paper_trading.py
+   python ppo_paper_trading.py
+   ```
 
-Type exit to close the Docker container when you're finished.
+### Troubleshooting
+If you encounter the observation shape error:
+1. Check that your input data matches the model's expected shape (20, 16)
+2. Verify that the preprocessing steps match those used during model training
+3. If needed, reshape your input data before feeding it to the model
+4. The system now includes an automatic observation reshaping wrapper that will attempt to convert (58,) shaped observations to the required (20, 16) shape
+
+Note: The automatic reshaping is a temporary solution. For optimal performance, it's recommended to:
+- Retrain the model with the correct observation shape
+- Or modify the environment to provide observations in the correct shape
+- Or adjust the feature engineering process to match the expected shape
+
+Type `exit` to close the Docker container when you're finished.
 
 ## Optional: Using Docker Compose
 To further automate and manage concurrent script execution, you can modify the provided docker-compose.yml to define services for each script.
