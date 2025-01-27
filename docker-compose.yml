@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 version: "3.8"
 
 services:
@@ -20,3 +21,25 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+=======
+version: "3.8"
+
+services:
+  finrl:
+    build:
+      context: .
+    container_name: finrl-paper-trading
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+>>>>>>> Stashed changes

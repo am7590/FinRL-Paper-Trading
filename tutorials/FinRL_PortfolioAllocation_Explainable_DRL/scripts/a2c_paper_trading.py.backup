@@ -1,12 +1,12 @@
 import json
-from stable_baselines3 import PPO
+from stable_baselines3 import A2C
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
 from finrl.config import INDICATORS
 import os
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
-CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_Fundamental/config.json')
-MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_StockTrading_Fundamental/models/trained_ppo.zip')
+CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/config.json')
+MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/models/trained_a2c.zip')
 
 # Load configuration
 with open(CONFIG_PATH, 'r') as f:
@@ -23,15 +23,15 @@ time_interval = config["training"]["time_interval"]
 action_dim = len(ticker_list)
 state_dim = eval(config["training"]["state_dim_formula"].replace("action_dim", str(action_dim)).replace("INDICATORS", "INDICATORS"))
 
-# PPO Paper Trading
-ppo_model = PPO.load(MODEL_PATH)
-print("PPO model loaded successfully!")
+# A2C Paper Trading
+a2c_model = A2C.load(MODEL_PATH)
+print("A2C model loaded successfully!")
 
-paper_trading_ppo = PaperTradingAlpaca(
+paper_trading_a2c = PaperTradingAlpaca(
     ticker_list=ticker_list,
     time_interval=time_interval,
     drl_lib="stable_baselines3",
-    agent="ppo",
+    agent="a2c",
     cwd=MODEL_PATH,
     net_dim=config["training"]["net_dimension"],
     state_dim=state_dim,
@@ -44,5 +44,5 @@ paper_trading_ppo = PaperTradingAlpaca(
     max_stock=config["trading"]["max_stock"]
 )
 
-# Run PPO paper trading
-paper_trading_ppo.run()
+# Run A2C paper trading
+paper_trading_a2c.run()
