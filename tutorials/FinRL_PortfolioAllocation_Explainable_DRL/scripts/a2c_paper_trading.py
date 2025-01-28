@@ -1,4 +1,3 @@
-
 import sys
 import os
 
@@ -76,8 +75,8 @@ paper_trading_a2c.run()
 
 import json
 from stable_baselines3 import A2C
-from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
-from finrl.config import INDICATORS
+from finrl.finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
+from finrl.finrl.config import INDICATORS
 import os
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
