@@ -9,7 +9,7 @@
   },
   "training": {
     "time_interval": "1Min",
-    "ticker_list": ["AAPL", "MSFT", "GOOG", "AMZN", "FB"],
+    "ticker_list": ["AAPL", "MSFT", "GOOG", "AMZN"],
     "net_dimension": [128, 64],
     "target_step": 5000,
     "break_step": 100000,
@@ -18,7 +18,7 @@
     "state_dim_formula": "1 + 2 + 3 * action_dim + len(INDICATORS) * action_dim"
   },
   "trading": {
-    "turbulence_thresh": 30,
+    "turbulence_thresh": 100,
     "max_stock": 100
   },
   "dates": {
