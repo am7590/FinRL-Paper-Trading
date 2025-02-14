@@ -1,7 +1,6 @@
 import json
 from stable_baselines3 import A2C
 from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
-from finrl.config import INDICATORS
 import os
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
@@ -21,7 +20,16 @@ TRADING_API_BASE_URL = config["alpaca"]["trading_api_base_url"]
 ticker_list = config["training"]["ticker_list"]
 time_interval = config["training"]["time_interval"]
 action_dim = len(ticker_list)
-state_dim = eval(config["training"]["state_dim_formula"].replace("action_dim", str(action_dim)).replace("INDICATORS", "INDICATORS"))
+
+# Define technical indicators that stockstats can calculate
+TECH_INDICATORS_LIST = [
+    'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'cci_30', 'dx_30',
+    'close_30_sma', 'close_60_sma', 'close_5_sma', 'close_10_sma',
+    'close_20_sma', 'close_120_sma', 'close_20_mstd', 'volume_20_sma',
+    'volume_60_sma'
+]
+
+state_dim = 1 + 2*action_dim + len(TECH_INDICATORS_LIST)*action_dim
 
 # A2C Paper Trading
 a2c_model = A2C.load(MODEL_PATH)
@@ -39,7 +47,7 @@ paper_trading_a2c = PaperTradingAlpaca(
     API_KEY=TRADING_API_KEY,
     API_SECRET=TRADING_API_SECRET,
     API_BASE_URL=TRADING_API_BASE_URL,
-    tech_indicator_list=INDICATORS,
+    tech_indicator_list=TECH_INDICATORS_LIST,
     turbulence_thresh=config["trading"]["turbulence_thresh"],
     max_stock=config["trading"]["max_stock"]
 )
