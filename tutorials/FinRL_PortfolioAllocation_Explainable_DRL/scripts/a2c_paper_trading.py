@@ -6,9 +6,50 @@ from finrl.config import INDICATORS
 import os
 import sys
 import numpy as np
+from datetime import datetime
+import logging
+import pathlib
+from pathlib import Path
+
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
 sys.path.append(ROOT_DIR)
 from tutorials.utils.observation_wrapper import ObservationReshapeWrapper
+
+# Define shared mount location for logs
+HOME = str(Path.home())
+SHARED_LOG_DIR = os.path.join(HOME, 'shared_finrl_logs')
+INSTANCE_LOG_DIR = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/trading_logs')
+
+# Create both local and shared log directories
+os.makedirs(SHARED_LOG_DIR, exist_ok=True)
+os.makedirs(INSTANCE_LOG_DIR, exist_ok=True)
+
+# Create unique log file names with timestamp
+current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+shared_log_file = os.path.join(SHARED_LOG_DIR, f'trading_log_{current_time}.txt')
+instance_log_file = os.path.join(INSTANCE_LOG_DIR, f'trading_log_{current_time}.txt')
+
+# Configure logging to write to both locations
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
+    handlers=[
+        logging.FileHandler(shared_log_file),
+        logging.FileHandler(instance_log_file),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
+
+def log_and_print(message):
+    """Helper function to both log and print messages"""
+    print(message)
+    logger.info(message)
+
+# Log the setup information
+log_and_print(f"Logging setup complete. Logs will be saved to:")
+log_and_print(f"Shared location: {shared_log_file}")
+log_and_print(f"Instance location: {instance_log_file}")
 
 CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/config.json')
 MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/models/trained_a2c.zip')
@@ -42,25 +83,24 @@ class CustomPaperTradingAlpaca(PaperTradingAlpaca):
         
     def trade(self):    
         state = self.get_state()
-        print("\n=== Trading Cycle Start ===")
-        print(f"Current State Shape: {state.shape}")
-        print(f"Current State Values: {state}")
+        log_and_print("\n=== Trading Cycle Start ===")
+        log_and_print(f"Current State Shape: {state.shape}")
+        log_and_print(f"Current State Values: {state}")
 
         # Get model prediction and scale it
         action = self.model.predict(state)[0]
-        # Scale actions from [0,1] to [-100,100] range
         scaled_action = (action * 200) - 100
-        scaled_action = scaled_action[:len(self.stockUniverse)]  # Only take first 4 values for our stocks
+        scaled_action = scaled_action[:len(self.stockUniverse)]
         
-        print(f"\nRaw Predicted Action: {action}")
-        print(f"Scaled Action: {scaled_action}")
-        print(f"Action Shape: {action.shape}")
+        log_and_print(f"\nRaw Predicted Action: {action}")
+        log_and_print(f"Scaled Action: {scaled_action}")
+        log_and_print(f"Action Shape: {action.shape}")
 
         # Current portfolio state
-        print("\nPortfolio Status:")
-        print(f"Cash: ${self.cash:.2f}")
-        print(f"Current Stock Holdings: {self.stocks}")
-        print(f"Current Stock Prices: {self.price}")
+        log_and_print("\nPortfolio Status:")
+        log_and_print(f"Cash: ${self.cash:.2f}")
+        log_and_print(f"Current Stock Holdings: {self.stocks}")
+        log_and_print(f"Current Stock Prices: {self.price}")
         
         self.stocks_cd += 1
         if self.turbulence_bool == 0:
@@ -68,29 +108,29 @@ class CustomPaperTradingAlpaca(PaperTradingAlpaca):
             
             # Check sell conditions
             sell_indices = np.where(scaled_action < -min_action)[0]
-            print(f"\nPotential Sell Opportunities: {sell_indices}")
+            log_and_print(f"\nPotential Sell Opportunities: {sell_indices}")
             for index in sell_indices:
                 sell_num_shares = min(self.stocks[index], -scaled_action[index])
                 qty = abs(int(sell_num_shares))
                 ticker = self.stockUniverse[index]
-                print(f"\nSell Analysis for {ticker}:")
-                print(f"- Current Holdings: {self.stocks[index]}")
-                print(f"- Sell Action Value: {scaled_action[index]}")
-                print(f"- Calculated Sell Quantity: {qty}")
+                log_and_print(f"\nSell Analysis for {ticker}:")
+                log_and_print(f"- Current Holdings: {self.stocks[index]}")
+                log_and_print(f"- Sell Action Value: {scaled_action[index]}")
+                log_and_print(f"- Calculated Sell Quantity: {qty}")
                 
                 if qty > 0:
-                    print(f"Executing sell order for {qty} shares of {ticker}")
+                    log_and_print(f"Executing sell order for {qty} shares of {ticker}")
                     respSO = []
                     self.submitOrder(qty, ticker, "sell", respSO)
-                    print(f"Sell order response: {respSO}")
+                    log_and_print(f"Sell order response: {respSO}")
                     self.cash = float(self.alpaca.get_account().cash)
                     self.stocks_cd[index] = 0
                 else:
-                    print(f"Skipping sell for {ticker} due to zero quantity")
+                    log_and_print(f"Skipping sell for {ticker} due to zero quantity")
 
             # Check buy conditions
             buy_indices = np.where(scaled_action > min_action)[0]
-            print(f"\nPotential Buy Opportunities: {buy_indices}")
+            log_and_print(f"\nPotential Buy Opportunities: {buy_indices}")
             for index in buy_indices:
                 if self.cash < 0:
                     tmp_cash = 0
@@ -103,25 +143,26 @@ class CustomPaperTradingAlpaca(PaperTradingAlpaca):
                 qty = abs(int(buy_num_shares))
                 ticker = self.stockUniverse[index]
                 
-                print(f"\nBuy Analysis for {ticker}:")
-                print(f"- Available Cash: ${tmp_cash:.2f}")
-                print(f"- Stock Price: ${self.price[index]:.2f}")
-                print(f"- Buy Action Value: {scaled_action[index]}")
-                print(f"- Calculated Buy Quantity: {qty}")
+                log_and_print(f"\nBuy Analysis for {ticker}:")
+                log_and_print(f"- Available Cash: ${tmp_cash:.2f}")
+                log_and_print(f"- Stock Price: ${self.price[index]:.2f}")
+                log_and_print(f"- Buy Action Value: {scaled_action[index]}")
+                log_and_print(f"- Calculated Buy Quantity: {qty}")
                 
                 if qty > 0:
-                    print(f"Executing buy order for {qty} shares of {ticker}")
+                    log_and_print(f"Executing buy order for {qty} shares of {ticker}")
                     respSO = []
                     self.submitOrder(qty, ticker, "buy", respSO)
-                    print(f"Buy order response: {respSO}")
+                    log_and_print(f"Buy order response: {respSO}")
                     self.cash = float(self.alpaca.get_account().cash)
                     self.stocks_cd[index] = 0
                 else:
-                    print(f"Skipping buy for {ticker} due to zero quantity or insufficient funds")
+                    log_and_print(f"Skipping buy for {ticker} due to zero quantity or insufficient funds")
         else:
-            print("\nTurbulence detected. Skipping trades to avoid risk.")
+            log_and_print("\nTurbulence detected. Skipping trades to avoid risk.")
             
-        print("\n=== Trading Cycle End ===\n")
+        log_and_print("\n=== Trading Cycle End ===\n")
+        log_and_print("-" * 80 + "\n")  # Add a separator line between trading cycles
 
 paper_trading_a2c = CustomPaperTradingAlpaca(
     wrapped_model=wrapped_model,
