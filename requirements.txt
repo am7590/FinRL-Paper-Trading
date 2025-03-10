@@ -130,7 +130,7 @@ six==1.16.0
 smart-open==7.0.5
 soupsieve==2.6
 SQLAlchemy==2.0.36
-stable_baselines3==2.4.0a11
+stable-baselines3
 stack-data==0.6.3
 stockstats==0.5.4
 sympy==1.13.1
@@ -159,3 +159,4 @@ wrapt==1.16.0
 wrds==3.2.0
 yarl==1.17.1    
 yfinance==0.2.48
+finrl

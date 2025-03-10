@@ -1,40 +1,27 @@
-# Rest of the Dockerfile remains unchanged
-FROM python:3.10.15
-
-# Update ENV syntax to use recommended format
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Set working directory inside the container
-WORKDIR /app
+FROM python:3.10-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    pkg-config \
-    libopenblas-dev \
-    liblapack-dev \
-    libsdl2-dev \
-    libsdl2-image-dev \
-    libsdl2-mixer-dev \
-    libsdl2-ttf-dev \
-    vim \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the requirements file and install Python dependencies
-COPY requirements.txt /app/
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Initialize and update submodules (for finrl)
-# RUN git submodule init && git submodule update --recursive
+# Copy the rest of the application
+COPY . .
 
-# Copy the entire project directory into the container
-COPY . /app
+# Create directories for logs
+RUN mkdir -p /app/trading_logs /shared_logs
 
-# Install the local finrl package
-RUN pip install -e ./finrl
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV SHARED_LOG_DIR=/shared_logs
+ENV INSTANCE_LOG_DIR=/app/trading_logs
 
-# Default command to run the main paper trading script
-CMD ["python", "tutorials/FinRL_PaperTrading_Demo/scripts/paper_trading.py"]
+# Command to run the script
+CMD ["python", "tutorials/FinRL_PortfolioAllocation_Explainable_DRL/scripts/a2c_paper_trading.py"]

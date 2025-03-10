@@ -1,22 +1,19 @@
 version: "3.8"
 
 services:
-  finrl:
-    build:
-      context: .
-    container_name: finrl-paper-trading
-    stdin_open: true
-    tty: true
+  trading_bot:
+    build: .
     volumes:
-      - type: bind
-        source: .
-        target: /app
+      - shared_logs:/shared_logs
+      - ./trading_logs:/app/trading_logs
     environment:
-      - PYTHONDONTWRITEBYTECODE=1
-      - PYTHONUNBUFFERED=1
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - SHARED_LOG_DIR=/shared_logs
+      - INSTANCE_LOG_DIR=/app/trading_logs
+      # Add your Alpaca API keys here
+      - ALPACA_API_KEY=${ALPACA_API_KEY}
+      - ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}
+      - ALPACA_BASE_URL=${ALPACA_BASE_URL}
+
+volumes:
+  shared_logs:
+    name: finrl_shared_logs

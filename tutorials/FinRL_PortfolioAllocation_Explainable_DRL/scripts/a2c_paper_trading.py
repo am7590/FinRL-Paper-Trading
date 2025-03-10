@@ -16,9 +16,8 @@ sys.path.append(ROOT_DIR)
 from tutorials.utils.observation_wrapper import ObservationReshapeWrapper
 
 # Define shared mount location for logs
-HOME = str(Path.home())
-SHARED_LOG_DIR = os.path.join(HOME, 'shared_finrl_logs')
-INSTANCE_LOG_DIR = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/trading_logs')
+SHARED_LOG_DIR = os.getenv('SHARED_LOG_DIR', os.path.join(str(Path.home()), 'shared_finrl_logs'))
+INSTANCE_LOG_DIR = os.getenv('INSTANCE_LOG_DIR', os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/trading_logs'))
 
 # Create both local and shared log directories
 os.makedirs(SHARED_LOG_DIR, exist_ok=True)
