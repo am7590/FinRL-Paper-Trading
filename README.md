@@ -6,8 +6,7 @@ These instructions will help you set up and run the project in a Docker containe
 
 ### Prerequisites
 
-- **Docker**: Make sure Docker is installed on your system. You can download it [here](https://www.docker.com/get-started).
-- **Git**: Ensure Git is installed if you need to clone the repository.
+- **Docker**: Download it [here](https://www.docker.com/get-started).
 
 ### Installation
 
@@ -25,24 +24,30 @@ These instructions will help you set up and run the project in a Docker containe
 
    `docker build -t finrl-paper-trading .`
 
-   This will create a Docker image named finrl-paper-trading, encapsulating all dependencies and configuration needed to run the project.
-
 ## Usage
 
-   Run the container interactively to execute each paper trading script as needed:
-
    `docker run -it --rm --name finrl-container finrl-paper-trading bash`
+
+## Important Note About Model Input Shape
+Ensuring that your input data matches the model's expected shape is crucial to prevent shape mismatch errors in financial reinforcement learning models. These errors often arise from discrepancies in the number of tickers (assets), technical indicators, or the data window length used during preprocessing.​
+
+### Key Factors Influencing Input Shape:
+- Number of Tickers (Assets): The total number of financial assets included in your dataset.​
+- Number of Technical Indicators: The set of calculated metrics (e.g., moving averages, RSI) applied to each asset.​
+- Data Window Length: The number of historical time steps considered for each observation.​
+
+### Typical Expected Input Shape:
+Models often expect input data in a three-dimensional array with the shape (number of tickers, number of indicators, window length). For example, with 20 tickers, 16 indicators, and a window length of 10, the expected input shape would be (20, 16, 10).​
+
+### Recommendations to Resolve Shape Mismatch Errors:
+- Double check the paper trading script's config file for timeframe, number of indicators, and number of stock tickers. Reference this to the saved colab files in the shared drive, where the configs are saved. Make sure (number of tickers, number of indicators, window length) matches up between the two configs.
+- Verify Data Dimensions: Ensure that your data maintains the correct multi-dimensional structure throughout the preprocessing pipeline.​
+- Consistent Preprocessing: Apply the same preprocessing steps to both training and paper trading scripts. The colab notebooks used to train all models in this repo are available in our shared drive for reference.
 
 ## Execute Paper Trading Scripts
 Navigate to each directory and execute scripts as needed:
 
-### Important Note About Model Input Shape
-The models expect specific input shapes for observations. If you encounter shape mismatch errors, you may need to adjust your data preprocessing to match the expected shapes:
-- Default expected shape: (20, 16)
-- Current shape causing error: (58,)
-
 ### Available Scripts
-
 - FinRL_PortfolioAllocation_Explainable_DRL (A2C and PPO)
    ```bash
    cd tutorials/FinRL_PortfolioAllocation_Explainable_DRL/scripts
@@ -71,28 +76,58 @@ The models expect specific input shapes for observations. If you encounter shape
    python ppo_paper_trading.py
    ```
 
-### Troubleshooting
-If you encounter the observation shape error:
-1. Check that your input data matches the model's expected shape (20, 16)
-2. Verify that the preprocessing steps match those used during model training
-3. If needed, reshape your input data before feeding it to the model
-4. The system now includes an automatic observation reshaping wrapper that will attempt to convert (58,) shaped observations to the required (20, 16) shape
+# Delpoying to AWS EC2
 
-Note: The automatic reshaping is a temporary solution. For optimal performance, it's recommended to:
-- Retrain the model with the correct observation shape
-- Or modify the environment to provide observations in the correct shape
-- Or adjust the feature engineering process to match the expected shape
+## 1. Setup EC2 environment
 
-Type `exit` to close the Docker container when you're finished.
+- Update the package index:
 
-## Optional: Using Docker Compose
-To further automate and manage concurrent script execution, you can modify the provided docker-compose.yml to define services for each script.
+  ```sudo yum update -y```
 
-## Configuration
-Each tutorial directory contains a config.json file with model-specific configurations (API keys, trading parameters, etc.). Make sure these are set correctly if any adjustments are needed for different environments.
+- Install Git:
+  
+   ```sudo yum install -y git```
 
-## Future Improvements
-This setup can be adapted for API-based use cases, where an external service (e.g., FinRobot) can trigger each script through an HTTP request or similar. Further modularization into a class structure for each trading strategy could improve integration with external services.
+- Install Docker:
+  
+   ```sudo yum install -y docker```
+
+- Start Docker service:
+
+   ```sudo systemctl start docker```
+
+- Enable Docker to start on boot:
+  
+   ```sudo systemctl enable docker```
+
+- Verify Docker installation:
+
+   ```docker --version```
+
+## 2. Run a paper trading script in the background
+
+- Install screen if not already installed:
+  
+   ```sudo yum install screen -y```
+
+- NOTE: Screens have a 1 to 1 relationship with paper trading scripts.
+- ANOTHER NOTE: Don't use 'finrobot' for your own images! Be more specific.
+
+- Create a new screen session:
+
+  ```screen -S finrobot```
+
+- Inside the screen session, run your docker compose command:
+
+  ```sudo docker run -it --rm --name finrl-container finrl-paper-trading bash```
+
+## 3. Final steps
+- Detach from screen session (don't close it) by pressing: Ctrl+A then D
+- To reattach to the screen session later:
+
+  ```screen -r finrobot```
+
+
 
 ## License
 This project is licensed under the MIT License.
