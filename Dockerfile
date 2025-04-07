@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 # Install system dependencies and build tools
 RUN apt-get update && apt-get install -y \
@@ -15,13 +15,17 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install Python packages
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --timeout 1000 --retries 3 --no-deps -r requirements.txt
+
+RUN pip install --no-cache-dir --timeout 600 torch --index-url https://download.pytorch.org/whl/cpu
 
 # Copy the rest of the application
 COPY . .
 
 # Create directories for logs
-RUN mkdir -p /app/trading_logs /shared_logs
+RUN mkdir -p /app/trading_logs/shared_logs
+
+RUN chmod -R 777 /app/trading_logs/shared_logs
 
 # Set environment variables
 ENV PYTHONPATH=/app

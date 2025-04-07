@@ -1,19 +1,24 @@
-version: "3.8"
+# version: "3.8"
 
 services:
   trading_bot:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     volumes:
-      - shared_logs:/shared_logs
-      - ./trading_logs:/app/trading_logs
+      - type: bind
+        source: ./logs
+        target: /shared_logs
+      - type: bind
+        source: ./trading_logs
+        target: /app/trading_logs
     environment:
       - SHARED_LOG_DIR=/shared_logs
       - INSTANCE_LOG_DIR=/app/trading_logs
-      # Add your Alpaca API keys here
-      - ALPACA_API_KEY=${ALPACA_API_KEY}
-      - ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}
-      - ALPACA_BASE_URL=${ALPACA_BASE_URL}
+      - ALPACA_API_KEY=$"PK4HGNHDEMG6JRA0SDHU"
+      - ALPACA_SECRET_KEY=$"2xghjJbvOxUxGBKNUJJYxYako2bEFjIt8Gv9Dpdd"
+      - ALPACA_BASE_URL=$"https://paper-api.alpaca.markets/v2"
 
-volumes:
-  shared_logs:
-    name: finrl_shared_logs
+    tty: true
+    stdin_open: true
+    command: /bin/bash

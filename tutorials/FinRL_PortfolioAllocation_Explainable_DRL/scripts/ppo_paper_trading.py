@@ -1,7 +1,7 @@
 import json
 from stable_baselines3 import PPO
-from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
-from finrl.config import INDICATORS
+from finrl.finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
+from finrl.finrl.config import INDICATORS
 import os
 import sys
 import numpy as np
