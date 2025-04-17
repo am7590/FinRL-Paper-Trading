@@ -159,3 +159,6 @@ wrapt==1.16.0
 wrds==3.2.0
 yarl==1.17.1    
 yfinance==0.2.48
+google-auth-oauthlib 
+google-auth-httplib2 
+google-api-python-client
