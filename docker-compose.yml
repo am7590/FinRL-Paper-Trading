@@ -1,22 +1,22 @@
-version: "3.8"
-
 services:
   trading_bot:
     build: .
     volumes:
       - shared_logs:/shared_logs
       - ./trading_logs:/app/trading_logs
-      - ./credentials.json:/app/credentials.json:ro  # Mount Google credentials
+      - ./credentials:/app/credentials
     environment:
+      - PYTHONPATH=/app
       - SHARED_LOG_DIR=/shared_logs
       - INSTANCE_LOG_DIR=/app/trading_logs
       # Add your Alpaca API keys here
-      - ALPACA_API_KEY=${ALPACA_API_KEY}
-      - ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}
-      - ALPACA_BASE_URL=${ALPACA_BASE_URL}
+      - ALPACA_API_KEY="PKTEH27SSLJTPGERY87Y"
+      - ALPACA_SECRET_KEY="weAlrX23qbggduJaqOiVqRDJxNDgQ7q7RfFfYX0C"
+      - ALPACA_BASE_URL="https://paper-api.alpaca.markets"
       # Google Docs integration
-      - GOOGLE_DOCS_CREDENTIALS_PATH=/app/credentials.json
+      - GOOGLE_DOCS_CREDENTIALS_PATH=/app/credentials/service_account.json
       - GOOGLE_DOC_ID=${GOOGLE_DOC_ID}
+    restart: unless-stopped
 
 volumes:
   shared_logs:
