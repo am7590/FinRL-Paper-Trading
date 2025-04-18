@@ -1,40 +1,40 @@
 # Rest of the Dockerfile remains unchanged
-FROM python:3.10.15
+FROM python:3.10-slim
 
-# Update ENV syntax to use recommended format
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Set working directory inside the container
-WORKDIR /app
-
-# Install system dependencies
+# Install system dependencies and build tools
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    pkg-config \
-    libopenblas-dev \
-    liblapack-dev \
-    libsdl2-dev \
-    libsdl2-image-dev \
-    libsdl2-mixer-dev \
-    libsdl2-ttf-dev \
-    vim \
     git \
+    gcc \
+    g++ \
+    make \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the requirements file and install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+# Set working directory
+WORKDIR /app
 
-# Initialize and update submodules (for finrl)
-# RUN git submodule init && git submodule update --recursive
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
 
-# Copy the entire project directory into the container
-COPY . /app
+# Install Python packages
+RUN pip install --no-cache-dir --timeout 1000 --retries 3 --no-deps -r requirements.txt
 
-# Install the local finrl package
-RUN pip install -e ./finrl
+RUN pip install --no-cache-dir --timeout 600 torch --index-url https://download.pytorch.org/whl/cpu
 
-# Default command to run the main paper trading script
-CMD ["python", "tutorials/FinRL_PaperTrading_Demo/scripts/paper_trading.py"]
+# Copy the rest of the application
+COPY . .
+
+# Create directories for logs
+RUN mkdir -p /app/trading_logs/shared_logs
+
+RUN chmod -R 777 /app/trading_logs/shared_logs
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV SHARED_LOG_DIR=/shared_logs
+ENV INSTANCE_LOG_DIR=/app/trading_logs
+# Google Docs integration (uncomment and set these to enable)
+# ENV GOOGLE_DOCS_CREDENTIALS_PATH=/app/credentials.json
+# ENV GOOGLE_DOC_ID=your_doc_id_here
+
+# Command to run the script
+CMD ["python", "tutorials/FinRL_PortfolioAllocation_Explainable_DRL/scripts/a2c_paper_trading.py"]

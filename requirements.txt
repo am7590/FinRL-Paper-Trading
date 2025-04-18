@@ -40,7 +40,10 @@ frozendict==2.4.6
 frozenlist==1.5.0
 fsspec==2024.10.0
 google-api-core==2.22.0
+google-api-python-client==2.123.0
 google-auth==2.36.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.0
 googleapis-common-protos==1.65.0
 grpcio==1.67.1
 gym==0.26.2
@@ -159,6 +162,3 @@ wrapt==1.16.0
 wrds==3.2.0
 yarl==1.17.1    
 yfinance==0.2.48
-google-auth-oauthlib 
-google-auth-httplib2 
-google-api-python-client

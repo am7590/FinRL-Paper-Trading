@@ -1,14 +1,69 @@
 import json
 import builtins
 from stable_baselines3 import A2C
-from finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
-from finrl.config import INDICATORS
+from finrl.finrl.meta.paper_trading.alpaca import PaperTradingAlpaca
+from finrl.finrl.config import INDICATORS
 import os
 import sys
 import numpy as np
+from datetime import datetime
+import logging
+import pathlib
+from pathlib import Path
+
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
 sys.path.append(ROOT_DIR)
 from tutorials.utils.observation_wrapper import ObservationReshapeWrapper
+from tutorials.FinRL_PortfolioAllocation_Explainable_DRL.scripts.google_docs_handler import GoogleDocsHandler
+
+# Define shared mount location for logs
+SHARED_LOG_DIR = os.getenv('SHARED_LOG_DIR', os.path.join(str(Path.home()), 'shared_finrl_logs'))
+INSTANCE_LOG_DIR = os.getenv('INSTANCE_LOG_DIR', os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/trading_logs'))
+
+# Create both local and shared log directories
+os.makedirs(SHARED_LOG_DIR, exist_ok=True)
+os.makedirs(INSTANCE_LOG_DIR, exist_ok=True)
+
+# Create unique log file names with timestamp
+current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+shared_log_file = os.path.join(SHARED_LOG_DIR, f'trading_log_{current_time}.txt')
+instance_log_file = os.path.join(INSTANCE_LOG_DIR, f'trading_log_{current_time}.txt')
+
+# Configure logging to write to both locations and Google Docs
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
+    handlers=[
+        logging.FileHandler(shared_log_file),
+        logging.FileHandler(instance_log_file),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Add Google Docs handler if credentials are available
+google_docs_credentials = os.getenv('GOOGLE_DOCS_CREDENTIALS_PATH')
+if google_docs_credentials and os.path.exists(google_docs_credentials):
+    google_docs_handler = GoogleDocsHandler(
+        doc_id=os.getenv('GOOGLE_DOC_ID'),
+        credentials_path=google_docs_credentials,
+        token_path=os.path.join(ROOT_DIR, 'token.json')
+    )
+    google_docs_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+    logger.addHandler(google_docs_handler)
+    print(f"Google Docs logging enabled. Document ID: {google_docs_handler.doc_id or 'Will create new document'}")
+else:
+    print("Google Docs logging disabled. Set GOOGLE_DOCS_CREDENTIALS_PATH environment variable to enable.")
+
+def log_and_print(message):
+    """Helper function to both log and print messages"""
+    print(message)
+    logger.info(message)
+
+# Log the setup information
+log_and_print(f"Logging setup complete. Logs will be saved to:")
+log_and_print(f"Shared location: {shared_log_file}")
+log_and_print(f"Instance location: {instance_log_file}")
 
 CONFIG_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/config.json')
 MODEL_PATH = os.path.join(ROOT_DIR, 'tutorials/FinRL_PortfolioAllocation_Explainable_DRL/models/trained_a2c.zip')
@@ -34,7 +89,6 @@ print("A2C model loaded successfully!")
 
 # Wrap the model with our observation reshaper
 wrapped_model = ObservationReshapeWrapper(a2c_model)
-
 class CustomPaperTradingAlpaca(PaperTradingAlpaca):
     def __init__(self, wrapped_model, *args, **kwargs):
         super().__init__(*args, **kwargs)
