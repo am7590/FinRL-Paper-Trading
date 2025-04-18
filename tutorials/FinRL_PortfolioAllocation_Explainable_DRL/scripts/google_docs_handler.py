@@ -42,6 +42,9 @@ class GoogleDocsHandler(logging.Handler):
                 
         self.service = build('docs', 'v1', credentials=creds)
         
+        if self.doc_id:
+            print(f"================================================================================\nLogging to existing Google Doc: https://docs.google.com/document/d/{self.doc_id}\n================================================================================")
+        
     def emit(self, record):
         """Emit a record to Google Docs."""
         try:
