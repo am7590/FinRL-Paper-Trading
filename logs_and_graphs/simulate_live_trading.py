@@ -27,10 +27,6 @@ class LiveTradingSimulator:
         self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         self.ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=5))
         
-        # Add a horizontal line at initial equity
-        self.ax.axhline(y=self.equity_data[0] if self.equity_data else 0, 
-                       color='black', linestyle='--', alpha=0.5)
-        
         plt.tight_layout()
     
     def reset_simulation(self):
@@ -103,10 +99,10 @@ class LiveTradingSimulator:
             self.ax.set_xlim(min(self.timestamps), max(self.timestamps))
             
             # Adjust y-axis limits with buffer
-            min_equity = min(self.equity_data)
-            max_equity = max(self.equity_data)
-            buffer = (max_equity - min_equity) * 0.1
-            self.ax.set_ylim(min_equity - buffer, max_equity + buffer)
+            min_value = min(self.equity_data)
+            max_value = max(self.equity_data)
+            buffer = (max_value - min_value) * 0.1
+            self.ax.set_ylim(min_value - buffer, max_value + buffer)
             
             # Add annotations for significant points
             if len(self.equity_data) > 1:
